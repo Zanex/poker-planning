@@ -121,7 +121,16 @@ export class PokerRoom {
     }
 
     user.vote = data.card;
-    this.broadcastUsers();
+    
+    // Send confirmation to the voter with their actual vote
+    const voterResponse: WSResponse = {
+      type: 'vote_update',
+      users: this.getUsersArray(ws)
+    };
+    ws.send(JSON.stringify(voterResponse));
+    
+    // Broadcast masked votes to others
+    this.broadcastUsers(ws);
   }
 
   async handleReveal() {
@@ -196,17 +205,22 @@ export class PokerRoom {
     };
   }
 
-  getUsersArray(): User[] {
-    return Array.from(this.roomState.users.values()).map(u => ({
-      ...u,
-      vote: this.roomState.revealed ? u.vote : (u.vote ? '🃏' : null)
-    }));
+  getUsersArray(excludeVotesFor?: WebSocket): User[] {
+    return Array.from(this.roomState.users.values()).map((u, _, usersList) => {
+      const userWs = Array.from(this.roomState.users.entries()).find(([_, user]) => user === u)?.[0];
+      const isRequester = userWs === excludeVotesFor;
+      
+      return {
+        ...u,
+        vote: this.roomState.revealed || isRequester ? u.vote : (u.vote ? '🃏' : null)
+      };
+    });
   }
 
-  broadcastUsers() {
+  broadcastUsers(senderWs?: WebSocket) {
     const response: WSResponse = {
       type: 'users',
-      users: this.getUsersArray()
+      users: this.getUsersArray(senderWs)
     };
     this.broadcast(response);
   }

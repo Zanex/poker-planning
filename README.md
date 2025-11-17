@@ -104,7 +104,7 @@ poker-planning/
 
 ```bash
 # Clone repo
-git clone https://github.com/yourusername/poker-planning.git
+git clone https://github.com/Zanex/poker-planning.git
 cd poker-planning
 
 # Install root dependencies (se necessario)
@@ -458,7 +458,7 @@ Questo progetto è licenziato sotto la MIT License - vedi il file [LICENSE](LICE
 Per problemi o suggerimenti:
 
 - Apri un issue su GitHub
-- Discussioni: [GitHub Discussions](https://github.com/yourusername/poker-planning/discussions)
+- Discussioni: [GitHub Discussions](https://github.com/Zanex/poker-planning/discussions)
 - Email: support@poker-planning.dev
 
 ## 🔗 Link Utili
@@ -473,4 +473,4 @@ Per problemi o suggerimenti:
 
 Fatto con ❤️ per il Poker Planning
 
-**Deploy Status**: [![Deploy](https://github.com/yourusername/poker-planning/workflows/deploy/badge.svg)](https://github.com/yourusername/poker-planning/actions)
+**Deploy Status**: [![Deploy](https://github.com/Zanex/poker-planning/workflows/deploy/badge.svg)](https://github.com/Zanex/poker-planning/actions)

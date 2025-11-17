@@ -43,7 +43,7 @@ export const usePokerStore = defineStore('poker', () => {
   }
 
   function updateUsers(newUsers: User[]) {
-    users.value = newUsers;
+    users.value = [...newUsers];
   }
 
   function setRevealed(value: boolean) {
