@@ -1,0 +1,29 @@
+name = "poker-planning"
+main = "src/index.ts"
+compatibility_date = "2025-01-15"
+
+# Worker configuration
+workers_dev = true
+route = ""
+zone_id = ""
+
+# Durable Objects binding
+[[durable_objects.bindings]]
+name = "POKER_ROOM"
+class_name = "PokerRoom"
+script_name = "poker-planning"
+
+# Durable Objects migration
+[[migrations]]
+tag = "v1"
+new_sqlite_classes = ["PokerRoom"]
+
+# D1 Database binding
+[[d1_databases]]
+binding = "DB"
+database_name = "poker_history"
+database_id = "a161b7d5-871d-4fb1-8365-1bc9d484da99"
+
+# CORS settings
+[env.production]
+vars = { ENVIRONMENT = "production" }

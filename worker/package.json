@@ -1,0 +1,17 @@
+{
+	"name": "poker-planning-worker",
+	"version": "1.0.0",
+	"private": true,
+	"scripts": {
+		"dev": "wrangler dev",
+		"deploy": "wrangler deploy",
+		"db:init": "wrangler d1 execute poker_history --file=./src/schema.sql",
+		"db:local": "wrangler d1 execute poker_history --local --file=./src/schema.sql"
+	},
+	"dependencies": {},
+	"devDependencies": {
+		"@cloudflare/workers-types": "^4.20250102.0",
+		"wrangler": "^3.95.0",
+		"typescript": "^5.7.2"
+	}
+}

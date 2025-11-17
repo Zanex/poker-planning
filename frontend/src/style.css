@@ -1,0 +1,27 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-500 min-h-screen;
+  }
+}
+
+@layer utilities {
+  .card-poker {
+    @apply aspect-[2/3] rounded-xl font-bold text-2xl transition-all duration-200;
+  }
+  
+  .card-poker:hover:not(:disabled) {
+    @apply shadow-lg scale-105;
+  }
+  
+  .card-selected {
+    @apply bg-indigo-600 text-white shadow-xl scale-105;
+  }
+  
+  .card-default {
+    @apply bg-gradient-to-br from-gray-100 to-gray-200 text-gray-700 hover:shadow-md;
+  }
+}
