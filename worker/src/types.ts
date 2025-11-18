@@ -1,3 +1,5 @@
+export type CardType = 'fibonacci' | 'tshirt' | 'powers' | 'sequential';
+
 export interface Env {
 	POKER_ROOM: DurableObjectNamespace;
 	DB: D1Database;
@@ -16,6 +18,7 @@ export interface RoomState {
 	revealed: boolean;
 	roundNumber: number;
 	sessionId: string | null;
+	cardType: CardType;
 	users: Map<WebSocket, User>;
 }
 
@@ -24,12 +27,14 @@ export interface WSMessage {
 	id?: string;
 	name?: string;
 	card?: string;
+	cardType?: CardType;
 }
 
 export interface WSResponse {
 	type: 'users' | 'vote_update' | 'revealed' | 'reset' | 'error';
 	users?: User[];
 	revealed?: boolean;
+	cardType?: CardType;
 	stats?: {
 		average: number;
 		median: number;

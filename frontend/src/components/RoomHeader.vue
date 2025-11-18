@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import { usePokerStore } from '@/stores/poker';
+import { CARD_TYPES } from '@/types';
 import { copyToClipboard, getRoomLink } from '@/utils';
 
 const emit = defineEmits<{
@@ -28,7 +29,7 @@ const copyLink = async () => {
         <h1 class="text-2xl font-bold text-gray-800">
           Room: {{ store.roomId }}
         </h1>
-        <div class="flex items-center gap-3 text-sm text-gray-600 mt-2">
+        <div class="flex items-center gap-3 text-sm text-gray-600 mt-2 flex-wrap">
           <div class="flex items-center gap-2">
             <div
               :class="[
@@ -40,6 +41,10 @@ const copyLink = async () => {
           </div>
           <span>•</span>
           <span>{{ store.totalUsers }} participants</span>
+          <span>•</span>
+          <span class="inline-block px-2 py-1 bg-indigo-100 text-indigo-700 rounded text-xs font-medium">
+            {{ CARD_TYPES[store.cardType].label }}
+          </span>
         </div>
       </div>
       

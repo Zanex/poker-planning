@@ -1,7 +1,7 @@
 import { onUnmounted } from 'vue';
 import { usePokerStore } from '@/stores/poker';
 import { useWebSocket } from './useWebSocket';
-import type { WSResponse, FibonacciCard } from '@/types';
+import type { WSResponse } from '@/types';
 
 export function usePokerRoom() {
   const store = usePokerStore();
@@ -14,12 +14,16 @@ export function usePokerRoom() {
         if (data.users) {
           store.updateUsers(data.users);
         }
+        if (data.cardType) {
+          store.setCardType(data.cardType);
+        }
         break;
 
       case 'revealed':
         store.setRevealed(true);
         if (data.users) store.updateUsers(data.users);
         if (data.stats) store.setStats(data.stats);
+        if (data.cardType) store.setCardType(data.cardType);
         break;
 
       case 'reset':
@@ -37,11 +41,12 @@ export function usePokerRoom() {
   const handleConnect = () => {
     store.setConnected(true);
     
-    // Send join message
+    // Send join message with cardType
     send({
       type: 'join',
       id: store.userId,
       name: store.userName,
+      cardType: store.cardType,
     });
   };
 
@@ -59,7 +64,7 @@ export function usePokerRoom() {
     connect(roomId, handleMessage, handleConnect, handleDisconnect);
   };
 
-  const vote = (card: FibonacciCard) => {
+  const vote = (card: string) => {
     send({
       type: 'vote',
       card,

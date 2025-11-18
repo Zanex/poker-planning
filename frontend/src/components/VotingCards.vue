@@ -1,13 +1,11 @@
 <script setup lang="ts">
 import { usePokerStore } from '@/stores/poker';
 import { usePokerRoom } from '@/composables/usePokerRoom';
-import { FIBONACCI_CARDS } from '@/types';
-import type { FibonacciCard } from '@/types';
 
 const store = usePokerStore();
 const { vote } = usePokerRoom();
 
-const handleVote = (card: FibonacciCard) => {
+const handleVote = (card: string) => {
   if (store.revealed) return;
   vote(card);
 };
@@ -21,7 +19,7 @@ const handleVote = (card: FibonacciCard) => {
     
     <div class="grid grid-cols-5 md:grid-cols-10 gap-3">
       <button
-        v-for="card in FIBONACCI_CARDS"
+        v-for="card in store.availableCards"
         :key="card"
         @click="handleVote(card)"
         :disabled="store.revealed"

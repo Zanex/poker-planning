@@ -2,6 +2,8 @@
 import { ref, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import { usePokerStore } from '@/stores/poker';
+import { CARD_TYPES } from '@/types';
+import type { CardType } from '@/types';
 import { generateRoomId } from '@/utils';
 
 const router = useRouter();
@@ -9,6 +11,7 @@ const store = usePokerStore();
 
 const roomId = ref('');
 const userName = ref('');
+const selectedCardType = ref<CardType>('fibonacci');
 
 onMounted(() => {
   // Check URL params
@@ -24,6 +27,8 @@ onMounted(() => {
   if (store.userName) {
     userName.value = store.userName;
   }
+
+  selectedCardType.value = store.cardType;
 });
 
 const createRoom = () => {
@@ -36,11 +41,12 @@ const joinRoom = () => {
     return;
   }
   
-  console.log('Joining room:', roomId.value, 'as', userName.value);
+  console.log('Joining room:', roomId.value, 'as', userName.value, 'with card type:', selectedCardType.value);
   
   // Salva prima nello store
   store.setUserName(userName.value);
   store.setRoomId(roomId.value);
+  store.setCardType(selectedCardType.value);
   
   // Naviga alla room
   router.push(`/room/${roomId.value}`);
@@ -71,6 +77,23 @@ const joinRoom = () => {
             placeholder="John Doe"
             @keyup.enter="joinRoom"
           />
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">
+            Estimation Scale
+          </label>
+          <select
+            v-model="selectedCardType"
+            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition bg-white"
+          >
+            <option v-for="(config, type) in CARD_TYPES" :key="type" :value="type">
+              {{ config.label }}
+            </option>
+          </select>
+          <p class="text-xs text-gray-500 mt-1">
+            Cards: {{ CARD_TYPES[selectedCardType].cards.join(', ') }}
+          </p>
         </div>
         
         <div>
@@ -108,6 +131,7 @@ const joinRoom = () => {
           <p class="mb-2">✨ Features</p>
           <ul class="space-y-1">
             <li>Real-time voting</li>
+            <li>Multiple estimation scales</li>
             <li>Automatic statistics</li>
             <li>Session history export</li>
           </ul>

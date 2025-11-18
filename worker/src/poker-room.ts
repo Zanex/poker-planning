@@ -1,4 +1,4 @@
-import { Env, User, WSMessage, WSResponse, RoomState, RoundData } from './types';
+import { Env, User, WSMessage, WSResponse, RoomState, RoundData, CardType } from './types';
 
 export class PokerRoom {
   state: DurableObjectState;
@@ -14,6 +14,7 @@ export class PokerRoom {
       revealed: false,
       roundNumber: 0,
       sessionId: null,
+      cardType: 'fibonacci',
       users: new Map()
     };
   }
@@ -97,6 +98,11 @@ export class PokerRoom {
 
     this.roomState.users.set(ws, user);
 
+    // Set cardType from first joiner
+    if (data.cardType && !this.roomState.sessionId) {
+      this.roomState.cardType = data.cardType;
+    }
+
     // Create session if first user
     if (this.roomState.users.size === 1 && !this.roomState.sessionId) {
       this.roomState.sessionId = crypto.randomUUID();
@@ -148,6 +154,7 @@ export class PokerRoom {
       type: 'revealed',
       users: this.getUsersArray(),
       revealed: true,
+      cardType: this.roomState.cardType,
       stats
     };
 
@@ -184,7 +191,11 @@ export class PokerRoom {
   calculateStats() {
     const votes = Array.from(this.roomState.users.values())
       .filter(u => u.vote && u.vote !== '?' && u.vote !== '☕')
-      .map(u => parseInt(u.vote!));
+      .map(u => {
+        const parsed = parseInt(u.vote!);
+        return isNaN(parsed) ? 0 : parsed;
+      })
+      .filter(v => v > 0);
 
     if (votes.length === 0) {
       return { average: 0, median: 0, total: 0 };
@@ -220,7 +231,8 @@ export class PokerRoom {
   broadcastUsers(senderWs?: WebSocket) {
     const response: WSResponse = {
       type: 'users',
-      users: this.getUsersArray(senderWs)
+      users: this.getUsersArray(senderWs),
+      cardType: this.roomState.cardType
     };
     this.broadcast(response);
   }
@@ -249,12 +261,13 @@ export class PokerRoom {
 
     try {
       await this.env.DB.prepare(
-        'INSERT INTO sessions (id, room_id, created_at) VALUES (?, ?, ?)'
+        'INSERT INTO sessions (id, room_id, created_at, card_type) VALUES (?, ?, ?, ?)'
       )
         .bind(
           this.roomState.sessionId,
           this.roomState.roomId,
-          new Date().toISOString()
+          new Date().toISOString(),
+          this.roomState.cardType
         )
         .run();
     } catch (error) {

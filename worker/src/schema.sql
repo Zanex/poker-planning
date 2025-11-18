@@ -3,7 +3,8 @@ CREATE TABLE IF NOT EXISTS sessions (
   id TEXT PRIMARY KEY,
   room_id TEXT NOT NULL,
   created_at TEXT NOT NULL,
-  completed_at TEXT
+  completed_at TEXT,
+  card_type TEXT DEFAULT 'fibonacci'
 );
 
 -- Individual Rounds Table

@@ -1,12 +1,14 @@
 import { defineStore } from 'pinia';
 import { ref, computed } from 'vue';
-import type { User, Stats } from '@/types';
+import type { User, Stats, CardType } from '@/types';
+import { CARD_TYPES } from '@/types';
 
 export const usePokerStore = defineStore('poker', () => {
   // State
   const roomId = ref<string>('');
   const userName = ref<string>('');
   const userId = ref<string>('');
+  const cardType = ref<CardType>('fibonacci');
   const users = ref<User[]>([]);
   const revealed = ref(false);
   const stats = ref<Stats | null>(null);
@@ -27,6 +29,10 @@ export const usePokerStore = defineStore('poker', () => {
 
   const votedCount = computed(() => users.value.filter(u => u.vote !== null).length);
 
+  const availableCards = computed(() => {
+    return CARD_TYPES[cardType.value].cards;
+  });
+
   // Actions
   function setRoomId(id: string) {
     roomId.value = id;
@@ -40,6 +46,11 @@ export const usePokerStore = defineStore('poker', () => {
 
   function setUserId(id: string) {
     userId.value = id;
+  }
+
+  function setCardType(type: CardType) {
+    cardType.value = type;
+    localStorage.setItem('poker_card_type', type);
   }
 
   function updateUsers(newUsers: User[]) {
@@ -70,9 +81,11 @@ export const usePokerStore = defineStore('poker', () => {
   function loadFromStorage() {
     const savedRoomId = localStorage.getItem('poker_room_id');
     const savedUsername = localStorage.getItem('poker_username');
+    const savedCardType = localStorage.getItem('poker_card_type') as CardType | null;
     
     if (savedRoomId) roomId.value = savedRoomId;
     if (savedUsername) userName.value = savedUsername;
+    if (savedCardType) cardType.value = savedCardType;
   }
 
   return {
@@ -80,6 +93,7 @@ export const usePokerStore = defineStore('poker', () => {
     roomId,
     userName,
     userId,
+    cardType,
     users,
     revealed,
     stats,
@@ -91,11 +105,13 @@ export const usePokerStore = defineStore('poker', () => {
     allVoted,
     totalUsers,
     votedCount,
+    availableCards,
     
     // Actions
     setRoomId,
     setUserName,
     setUserId,
+    setCardType,
     updateUsers,
     setRevealed,
     setStats,
