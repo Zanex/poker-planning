@@ -1,27 +1,39 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
 
 @layer base {
   body {
-    @apply bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-500 min-h-screen;
+    background: linear-gradient(135deg, rgb(79, 70, 229), rgb(147, 51, 234), rgb(236, 72, 153));
+    min-height: 100vh;
   }
 }
 
 @layer utilities {
   .card-poker {
-    @apply aspect-[2/3] rounded-xl font-bold text-2xl transition-all duration-200;
+    aspect-ratio: 2 / 3;
+    border-radius: 0.75rem;
+    font-weight: 700;
+    font-size: 1.5rem;
+    transition: all 200ms;
   }
   
   .card-poker:hover:not(:disabled) {
-    @apply shadow-lg scale-105;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+    transform: scale(1.05);
   }
   
   .card-selected {
-    @apply bg-indigo-600 text-white shadow-xl scale-105;
+    background-color: rgb(79, 70, 229);
+    color: white;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+    transform: scale(1.05);
   }
   
   .card-default {
-    @apply bg-gradient-to-br from-gray-100 to-gray-200 text-gray-700 hover:shadow-md;
+    background: linear-gradient(135deg, rgb(243, 244, 246), rgb(229, 231, 235));
+    color: rgb(55, 65, 81);
+  }
+  
+  .card-default:hover {
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
   }
 }
