@@ -5,6 +5,17 @@ on:
     branches: [main]
   pull_request:
     branches: [main]
+  workflow_dispatch:
+    inputs:
+      deploy-worker:
+        description: 'Deploy Worker'
+        required: false
+        default: 'true'
+      deploy-frontend:
+        description: 'Deploy Frontend'
+        required: false
+        default: 'true'
+
 
 jobs:
   deploy-worker:
