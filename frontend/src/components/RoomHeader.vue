@@ -40,7 +40,11 @@ const copyLink = async () => {
             {{ store.connected ? 'Connected' : 'Disconnected' }}
           </div>
           <span>•</span>
-          <span>{{ store.totalUsers }} participants</span>
+          <span>{{ store.totalPlayers }} players</span>
+          <span v-if="store.totalSpectators > 0">•</span>
+          <span v-if="store.totalSpectators > 0" class="text-purple-600">
+            👁️ {{ store.totalSpectators }} spectators
+          </span>
           <span>•</span>
           <span class="inline-block px-2 py-1 bg-indigo-100 text-indigo-700 rounded text-xs font-medium">
             {{ CARD_TYPES[store.cardType].label }}

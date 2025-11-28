@@ -1,4 +1,4 @@
-import { Env, User, WSMessage, WSResponse, RoomState, RoundData, CardType } from './types';
+import { Env, User, WSMessage, WSResponse, RoomState, RoundData } from './types';
 
 export class PokerRoom {
   state: DurableObjectState;
@@ -93,13 +93,14 @@ export class PokerRoom {
       name: data.name,
       vote: null,
       connected: true,
-      joinedAt: new Date().toISOString()
+      joinedAt: new Date().toISOString(),
+      isSpectator: data.isSpectator || false
     };
 
     this.roomState.users.set(ws, user);
 
-    // Set cardType from first joiner
-    if (data.cardType && !this.roomState.sessionId) {
+    // Set cardType from first non-spectator joiner
+    if (data.cardType && !this.roomState.sessionId && !data.isSpectator) {
       this.roomState.cardType = data.cardType;
     }
 
@@ -115,6 +116,12 @@ export class PokerRoom {
   async handleVote(ws: WebSocket, data: WSMessage) {
     const user = this.roomState.users.get(ws);
     if (!user) return;
+
+    // Spectators cannot vote
+    if (user.isSpectator) {
+      this.sendError(ws, 'Spectators cannot vote');
+      return;
+    }
 
     if (this.roomState.revealed) {
       this.sendError(ws, 'Voting closed - round already revealed');
@@ -190,7 +197,7 @@ export class PokerRoom {
 
   calculateStats() {
     const votes = Array.from(this.roomState.users.values())
-      .filter(u => u.vote && u.vote !== '?' && u.vote !== '☕')
+      .filter(u => !u.isSpectator && u.vote && u.vote !== '?' && u.vote !== '☕')
       .map(u => {
         const parsed = parseInt(u.vote!);
         return isNaN(parsed) ? 0 : parsed;
@@ -299,7 +306,7 @@ export class PokerRoom {
       // Insert votes
       const users = Array.from(this.roomState.users.values());
       for (const user of users) {
-        if (user.vote) {
+        if (user.vote && !user.isSpectator) {
           await this.env.DB.prepare(
             'INSERT INTO votes (id, round_id, user_name, vote, voted_at) VALUES (?, ?, ?, ?, ?)'
           )

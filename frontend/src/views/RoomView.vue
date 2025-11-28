@@ -21,6 +21,7 @@ const roomId = computed(() => route.params.id as string);
 onMounted(() => {
   // Carica dallo store se disponibile
   store.loadFromStorage();
+  console.log('store after loadFromStorage:', store);
   
   // Se non c'è username, torna al join
   if (!store.userName) {
@@ -29,7 +30,7 @@ onMounted(() => {
   }
   
   // Join alla room
-  joinRoom(roomId.value, store.userName);
+  joinRoom(roomId.value, store.userName, store.isSpectator);
 });
 </script>
 

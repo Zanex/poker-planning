@@ -8,6 +8,7 @@ export const usePokerStore = defineStore('poker', () => {
   const roomId = ref<string>('');
   const userName = ref<string>('');
   const userId = ref<string>('');
+  const isSpectator = ref<boolean>(false);
   const cardType = ref<CardType>('fibonacci');
   const users = ref<User[]>([]);
   const revealed = ref(false);
@@ -21,13 +22,22 @@ export const usePokerStore = defineStore('poker', () => {
     return me?.vote || null;
   });
 
+  const me = computed(() => {
+    return users.value.find(u => u.id === userId.value);
+  });
+
   const allVoted = computed(() => {
-    return users.value.length > 0 && users.value.every(u => u.vote !== null);
+    const voters = users.value.filter(u => !u.isSpectator);
+    return voters.length > 0 && voters.every(u => u.vote !== null);
   });
 
   const totalUsers = computed(() => users.value.length);
 
-  const votedCount = computed(() => users.value.filter(u => u.vote !== null).length);
+  const totalPlayers = computed(() => users.value.filter(u => !u.isSpectator).length);
+  
+  const totalSpectators = computed(() => users.value.filter(u => u.isSpectator).length);
+
+  const votedCount = computed(() => users.value.filter(u => !u.isSpectator && u.vote !== null).length);
 
   const availableCards = computed(() => {
     return CARD_TYPES[cardType.value].cards;
@@ -46,6 +56,11 @@ export const usePokerStore = defineStore('poker', () => {
 
   function setUserId(id: string) {
     userId.value = id;
+  }
+
+  function setIsSpectator(value: boolean) {
+    isSpectator.value = value;
+    localStorage.setItem('poker_is_spectator', value.toString());
   }
 
   function setCardType(type: CardType) {
@@ -82,10 +97,12 @@ export const usePokerStore = defineStore('poker', () => {
     const savedRoomId = localStorage.getItem('poker_room_id');
     const savedUsername = localStorage.getItem('poker_username');
     const savedCardType = localStorage.getItem('poker_card_type') as CardType | null;
+    const savedSpectator = localStorage.getItem('poker_is_spectator');
     
     if (savedRoomId) roomId.value = savedRoomId;
     if (savedUsername) userName.value = savedUsername;
     if (savedCardType) cardType.value = savedCardType;
+    if (savedSpectator) isSpectator.value = savedSpectator === 'true';
   }
 
   return {
@@ -93,6 +110,7 @@ export const usePokerStore = defineStore('poker', () => {
     roomId,
     userName,
     userId,
+    isSpectator,
     cardType,
     users,
     revealed,
@@ -102,8 +120,11 @@ export const usePokerStore = defineStore('poker', () => {
     
     // Computed
     myVote,
+    me,
     allVoted,
     totalUsers,
+    totalPlayers,
+    totalSpectators,
     votedCount,
     availableCards,
     
@@ -111,6 +132,7 @@ export const usePokerStore = defineStore('poker', () => {
     setRoomId,
     setUserName,
     setUserId,
+    setIsSpectator,
     setCardType,
     updateUsers,
     setRevealed,

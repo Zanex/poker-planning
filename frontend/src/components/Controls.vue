@@ -1,9 +1,12 @@
 <script setup lang="ts">
+import { computed } from 'vue';
 import { usePokerStore } from '@/stores/poker';
 import { usePokerRoom } from '@/composables/usePokerRoom';
 
 const store = usePokerStore();
 const { reveal, reset } = usePokerRoom();
+
+const isSpectatorMode = computed(() => store.me?.isSpectator ?? store.isSpectator);
 </script>
 
 <template>
@@ -12,7 +15,7 @@ const { reveal, reset } = usePokerRoom();
       <div class="flex gap-3">
         <button
           @click="reveal"
-          :disabled="!store.allVoted || store.revealed"
+          :disabled="!store.allVoted || store.revealed || isSpectatorMode"
           class="flex items-center gap-2 px-6 py-3 bg-indigo-600 text-white rounded-lg font-semibold hover:bg-indigo-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-all"
         >
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -34,7 +37,7 @@ const { reveal, reset } = usePokerRoom();
         
         <button
           @click="reset"
-          :disabled="!store.revealed"
+          :disabled="!store.revealed || isSpectatorMode"
           class="flex items-center gap-2 px-6 py-3 bg-purple-600 text-white rounded-lg font-semibold hover:bg-purple-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-all"
         >
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -75,8 +78,22 @@ const { reveal, reset } = usePokerRoom();
       </Transition>
     </div>
     
-    <div v-if="!store.allVoted && !store.revealed" class="mt-4 text-center text-sm text-gray-600">
+    <div v-if="!store.allVoted && !store.revealed && !isSpectatorMode" class="mt-4 text-center text-sm text-gray-600">
       Waiting for all participants to vote...
+    </div>
+
+    <div v-if="isSpectatorMode" class="mt-4 text-center">
+      <div class="inline-flex items-center gap-2 px-4 py-2 bg-purple-50 text-purple-700 rounded-lg text-sm">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+          />
+        </svg>
+        You are in spectator mode
+      </div>
     </div>
   </div>
 </template>

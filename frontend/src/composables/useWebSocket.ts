@@ -102,7 +102,7 @@ const send = (message: WSMessage) => {
   }
   
   if (wsInstance.readyState === WebSocket.OPEN) {
-    console.log('Sending message:', message);
+    console.log('Json sending message:', JSON.stringify(message));
     wsInstance.send(JSON.stringify(message));
   } else if (wsInstance.readyState === 0) { // CONNECTING
     console.warn('WebSocket is CONNECTING, queueing message', message);

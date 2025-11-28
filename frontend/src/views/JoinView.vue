@@ -11,6 +11,7 @@ const store = usePokerStore();
 
 const roomId = ref('');
 const userName = ref('');
+const isSpectator = ref(false);
 const selectedCardType = ref<CardType>('fibonacci');
 
 onMounted(() => {
@@ -28,6 +29,10 @@ onMounted(() => {
     userName.value = store.userName;
   }
 
+  if (store.isSpectator) {
+    isSpectator.value = store.isSpectator;
+  }
+
   selectedCardType.value = store.cardType;
 });
 
@@ -41,12 +46,13 @@ const joinRoom = () => {
     return;
   }
   
-  console.log('Joining room:', roomId.value, 'as', userName.value, 'with card type:', selectedCardType.value);
+  console.log('Joining room:', roomId.value, 'as', userName.value, 'with card type:', selectedCardType.value, 'spectator:', isSpectator.value);
   
   // Salva prima nello store
   store.setUserName(userName.value);
   store.setRoomId(roomId.value);
   store.setCardType(selectedCardType.value);
+  store.setIsSpectator(isSpectator.value);
   
   // Naviga alla room
   router.push(`/room/${roomId.value}`);
@@ -85,14 +91,18 @@ const joinRoom = () => {
           </label>
           <select
             v-model="selectedCardType"
-            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition bg-white"
+            :disabled="isSpectator"
+            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition bg-white disabled:bg-gray-100 disabled:text-gray-500"
           >
             <option v-for="(config, type) in CARD_TYPES" :key="type" :value="type">
               {{ config.label }}
             </option>
           </select>
-          <p class="text-xs text-gray-500 mt-1">
+          <p v-if="!isSpectator" class="text-xs text-gray-500 mt-1">
             Cards: {{ CARD_TYPES[selectedCardType].cards.join(', ') }}
+          </p>
+          <p v-else class="text-xs text-gray-500 mt-1">
+            Spectators don't need to choose a scale
           </p>
         </div>
         
@@ -115,6 +125,19 @@ const joinRoom = () => {
               New
             </button>
           </div>
+        </div>
+        
+        <div class="flex items-center gap-3 p-4 bg-gray-50 rounded-lg">
+          <input
+            v-model="isSpectator"
+            type="checkbox"
+            id="spectator"
+            class="w-5 h-5 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500"
+          />
+          <label for="spectator" class="flex-1 cursor-pointer">
+            <div class="font-medium text-gray-800">Join as Spectator</div>
+            <div class="text-sm text-gray-600">Watch only, don't participate in voting</div>
+          </label>
         </div>
         
         <button

@@ -8,10 +8,13 @@ export function usePokerRoom() {
   const { connect, send, disconnect } = useWebSocket();
 
   const handleMessage = (data: WSResponse) => {
+    console.log('Received message:', data);
+    
     switch (data.type) {
       case 'users':
       case 'vote_update':
         if (data.users) {
+          console.log('Updating users:', data.users);
           store.updateUsers(data.users);
         }
         if (data.cardType) {
@@ -20,6 +23,7 @@ export function usePokerRoom() {
         break;
 
       case 'revealed':
+        console.log('Cards revealed with stats:', data.stats);
         store.setRevealed(true);
         if (data.users) store.updateUsers(data.users);
         if (data.stats) store.setStats(data.stats);
@@ -27,6 +31,8 @@ export function usePokerRoom() {
         break;
 
       case 'reset':
+        console.error('Server error:', data.error);
+        console.log('Round reset');
         store.reset();
         if (data.users) store.updateUsers(data.users);
         break;
@@ -41,25 +47,30 @@ export function usePokerRoom() {
   const handleConnect = () => {
     store.setConnected(true);
     
-    // Send join message with cardType
-    send({
-      type: 'join',
+    // Send join message
+    const joinMessage = {
+      type: 'join' as const,
       id: store.userId,
       name: store.userName,
       cardType: store.cardType,
-    });
+      isSpectator: store.isSpectator,
+    };
+    
+    console.log('Sending join message:', joinMessage);
+    send(joinMessage);
   };
 
   const handleDisconnect = () => {
     store.setConnected(false);
   };
 
-  const joinRoom = (roomId: string, userName: string) => {
+  const joinRoom = (roomId: string, userName: string, isSpectator: boolean) => {
     const userId = crypto.randomUUID();
     
     store.setRoomId(roomId);
     store.setUserName(userName);
     store.setUserId(userId);
+    store.setIsSpectator(isSpectator);
     
     connect(roomId, handleMessage, handleConnect, handleDisconnect);
   };

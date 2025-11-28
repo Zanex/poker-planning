@@ -27,3 +27,6 @@ database_id = "a161b7d5-871d-4fb1-8365-1bc9d484da99"
 # CORS settings
 [env.production]
 vars = { ENVIRONMENT = "production" }
+
+[observability]
+enabled = true

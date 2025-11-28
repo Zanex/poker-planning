@@ -3,6 +3,7 @@ export interface User {
   name: string;
   vote: string | null;
   connected: boolean;
+  isSpectator: boolean;
   joinedAt?: string;
 }
 
@@ -18,6 +19,7 @@ export interface WSMessage {
   name?: string;
   card?: string;
   cardType?: CardType;
+  isSpectator?: boolean;
 }
 
 export interface WSResponse {
